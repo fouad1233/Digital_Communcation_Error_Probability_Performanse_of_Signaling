@@ -37,7 +37,7 @@ title('SNR vs Pb');
 grid on;
 
 % make random bits 100 thousand
-bit_num = 10^5;
+bit_num = 10^3;
 bits = randi([0 1],1,bit_num);
 % if the bit is 1 then the signal is s1(t) if 0 the signal is s2(t)
 signal = zeros(1,bit_num * length(t));
@@ -61,37 +61,66 @@ grid on;
 SNRdb = 0:0.01:11;
 % make the noise using awgn function
 SNR = 10.^(SNRdb/10);
-received_signal = awgn(signal,SNR(1),'measured');
-% plot the received signal for 5 T time
-figure;
-plot(t_signal(1:5*length(t)),received_signal(1:5*length(t)));
-xlabel('time');
-ylabel('received signal');
-title('received signal');
-grid on;
+bit_error_rate_sim = zeros(1,length(SNR));
+for j = 1:length(SNR)
+    received_signal = awgn(signal,SNR(j));
+    % plot the received signal for 5 T time
+    
+    %figure;
+    %plot(t_signal(1:5*length(t)),received_signal(1:5*length(t)));
+    %xlabel('time');
+    %ylabel('received signal');
+    %title('received signal');
+    %grid on;
 
-% make the decision for the received signal and obtain received bits
-received_bits = zeros(1,bit_num);
-% we will use correlation to decide the received bits
-% r(t) * (s1(t) - s2(t))  integral from 0 to T will be positive if the bit is 1
-% and negative if the bit is 0
+    % make the decision for the received signal and obtain received bits
+    received_bits = zeros(1,bit_num);
+    % we will use correlation to decide the received bits
+    % r(t) * (s1(t) - s2(t))  integral from 0 to T will be positive if the bit is 1
+    % and negative if the bit is 0
 
-comporator_gama = 0;
-for i = 1:bit_num
-    % get the received signal for the i th bit
-    received_signal_i = received_signal((i-1)*length(t)+1:i*length(t));
-    % calculate the correlation
-    correlation = sum(received_signal_i) .* (s1(t) - s2(t)) * Ts;
-    if correlation > comporator_gama
-        received_bits(i) = 1;
-    else
-        received_bits(i) = 0;
+    comporator_gama = 0;
+    for i = 1:bit_num
+        % get the received signal for the i th bit
+        received_signal_i = received_signal((i-1)*length(t)+1:i*length(t));
+        % calculate the correlation
+        correlation = sum(received_signal_i .* (s1(t) - s2(t)) * Ts);
+        if correlation > comporator_gama
+            received_bits(i) = 1;
+        else
+            received_bits(i) = 0;
+        end
     end
+
+    % calculate the bit error rate
+    bit_error_rate = sum(abs(received_bits - bits))/bit_num;
+    %display bit error for each SNR write SNR and bit error rate
+    display(['SNR = ',num2str(SNRdb(j)),' bit error rate = ',num2str(bit_error_rate)]);
+    bit_error_rate_sim(j) = bit_error_rate;
+
+
+
 end
 
-% calculate the bit error rate
-bit_error_rate = sum(abs(received_bits - bits))/bit_num;
-disp(['bit error rate = ',num2str(bit_error_rate)]);
+% plot the bit error rate simulation
+figure;
+semilogy(SNRdb,bit_error_rate_sim);
+xlabel('SNR (dB)');
+ylabel('bit error rate');
+title('SNR vs bit error rate');
+grid on;
 
+%% print the bit error from theorical and simulation
+% the theorical bit error rate is Pb
+% the simulation bit error rate is bit_error_rate_sim
 
+figure;
+semilogy(SNRdb,Pb);
+hold on;
+semilogy(SNRdb,bit_error_rate_sim);
+xlabel('SNR (dB)');
+ylabel('bit error rate');
+title('SNR vs bit error rate');
+legend('theorical','simulation');
+grid on;
 
