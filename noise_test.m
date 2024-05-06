@@ -63,8 +63,12 @@ grid on;
 SNR = 10.^(SNRdb/10);
 bit_error_rate_sim = zeros(1,length(SNR));
 power_signal = (sum(signal.^2)/length(signal));
+noise_std_dev = sqrt(power_signal./SNR);
+
 for j = 1:length(SNR)
-    received_signal = awgn(signal,SNRdb(j),power_signal);
+    % Generate Gaussian noise
+    noise = noise_std_dev(j) * randn(1, length(signal));
+    received_signal = signal + noise;
     % plot the received signal for 5 T time
     
     %figure;
