@@ -85,7 +85,7 @@ grid on;
 figure;
 semilogy(SNRdb,Pb);
 hold on;
-semilogy(SNRdb,Pb_sim);
+semilogy(SNRdb,Pb_sim,"*");
 
 ylim([10^-6,5*10^-1])
 legend('Pb from theory','Pb simulation')
@@ -194,7 +194,7 @@ grid on;
 figure;
 semilogy(SNRdb,Pb);
 hold on;
-semilogy(SNRdb,Pb_sim);
+semilogy(SNRdb,Pb_sim,'*');
 ylim([10^-6,5*10^-1])
 legend('Pb from theory','Pb simulation')
 xlabel('SNR (dB)');
