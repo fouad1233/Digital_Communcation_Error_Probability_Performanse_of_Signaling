@@ -35,7 +35,7 @@ semilogy(SNRdb,Pb);
 ylim([10^-6,5*10^-1])
 xlabel('SNR (dB)');
 ylabel('Pb');
-title('SNR vs Pb teorical for P(1)=P(0)=0.5');
+title('SNR vs Pb theorical for P(1)=P(0)=0.5');
 grid on;
 %%
 % make random bits 100 thousand
